@@ -4,6 +4,28 @@ const tours = JSON.parse(
   fs.readFileSync(`${__dirname}/../dev-data/data/tours-simple.json`)
 );
 
+exports.checkID = (req, res, next, val) => {
+  console.log(`Tour id is ${val}`);
+  if (val > tours.length)
+    return res.status(404).json({
+      status: 'fail',
+      message: 'Tour not found',
+    });
+  next();
+};
+
+exports.checkBody = (req, res, next) => {
+  const { name, price } = req.body;
+
+  if (!name || !price) {
+    return res.status(400).json({
+      status: 'fail',
+      message: 'Missing name or price',
+    });
+  }
+  next();
+};
+
 exports.getAllTours = (req, res) => {
   res.status(200).json({
     status: 'success',
@@ -40,11 +62,6 @@ exports.createTour = (req, res) => {
     `${__dirname}/dev-data/data/tours-simple.json`,
     JSON.stringify(tours),
     (err) => {
-      if (err)
-        return res
-          .status(400)
-          .send({ status: 'fail', message: 'Validation error' });
-
       res.status(201).send({
         status: 'success',
         data: {
@@ -57,13 +74,6 @@ exports.createTour = (req, res) => {
 
 exports.updateTour = (req, res) => {
   const tour_id = Number(req.params.id);
-
-  if (tour_id > tours.length)
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Tour not found',
-    });
-
   const updated_tour = tours[tour_id];
   updated_tour.name = req.body.name;
   updated_tour.duration = req.body.duration;
@@ -80,12 +90,6 @@ exports.updateTour = (req, res) => {
 
 exports.deleteTour = (req, res) => {
   const tour_id = Number(req.params.id);
-  if (tour_id > tours.length)
-    return res.status(404).json({
-      status: 'fail',
-      message: 'Tour not found',
-    });
-
   const updated_tours = tours.filter((tour) => tour.id !== tour_id);
 
   tours.push(updated_tours);
