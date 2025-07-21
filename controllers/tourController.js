@@ -1,8 +1,23 @@
 const Tour = require('../models/tourModel');
+const APIFeatures = require('../utils/apiFeatures');
+
+exports.aliasTopTours = async (req, res, next) => {
+  req.query.limit = 5;
+  req.query.limit.sort = '-ratingAverage,price';
+  req.query.limit.select = 'name,price,ratingAverage,summary,difficulty';
+
+  next();
+};
 
 exports.getAllTours = async (req, res) => {
   try {
-    const tours = await Tour.find();
+    const features = new APIFeatures(Tour.find(), req.query)
+      .filter()
+      .sort()
+      .limitFields()
+      .paginate();
+    const tours = await features.query;
+
     res.status(200).json({
       status: 'success',
       data: {
@@ -11,9 +26,9 @@ exports.getAllTours = async (req, res) => {
       },
     });
   } catch (error) {
-    res.status(500).json({
+    res.status(404).json({
       status: 'fail',
-      message: 'Internal Server error',
+      message: error.message,
     });
   }
 };
