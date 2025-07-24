@@ -19,6 +19,18 @@ const handleValidationErrorDB = (err) => {
   return new AppError(message, httpStatusCodes.StatusBadRequest);
 };
 
+const handleJWTError = () =>
+  new AppError(
+    'Invalid token. Please login again',
+    httpStatusCodes.StatusUnauthorized
+  );
+
+const handleJWTExpiredError = () =>
+  new AppError(
+    'Your token has expired. Please login again',
+    httpStatusCodes.StatusUnauthorized
+  );
+
 const sendErrorDev = (err, res) => {
   res.status(err.statusCode).json({
     status: err.status,
@@ -35,7 +47,6 @@ const sendErrorProd = (err, res) => {
       status: err.status,
       message: err.message,
     });
-
     // Programming or unknown errors: don't send to the client
   } else {
     //Log the error
@@ -62,7 +73,10 @@ module.exports = (err, req, res, next) => {
 
     if (error.name === 'CastError') error = handleCastErrorDB(error);
     if (error.name === 'MongoError') error = handleDuplicateFieldDB(error);
-    if (error.name === 'ValidationError') error = handleValidationErrorDB(err);
+    if (error.name === 'ValidationError')
+      error = handleValidationErrorDB(error);
+    if (error.name === 'JsonWebTokenError') error = handleJWTError();
+    if (error.name === 'TokenExpiredError') error = handleJWTExpiredError();
     sendErrorProd(error, res);
   }
 

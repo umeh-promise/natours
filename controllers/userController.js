@@ -1,9 +1,69 @@
-exports.getAllUsers = (req, res) => {
-  res.status(500).json({
-    status: 'error',
-    message: 'This route is not yet defined',
+const User = require('../models/userModel');
+const AppError = require('../utils/appError');
+const catchAsync = require('../utils/catchAsync');
+const httpStatusCodes = require('../utils/httpStatusCodes');
+
+const filterObj = (obj, ...allowedFields) => {
+  const newObj = {};
+  Object.keys(obj).forEach((el) => {
+    if (allowedFields.includes(el)) newObj[el] = obj[el];
   });
+
+  return newObj;
 };
+
+exports.getAllUsers = catchAsync(async (req, res) => {
+  const users = await User.find();
+
+  res.status(httpStatusCodes.StatusOK).json({
+    status: 'success',
+    data: {
+      users,
+      total: users.length,
+    },
+  });
+});
+
+exports.updateMe = catchAsync(async (req, res, next) => {
+  // Return error when user wants to update the password
+  if (req.body.password || req.body.passwordConfirm)
+    return next(
+      new AppError(
+        'This route is not for password update. Please use the update-password route',
+        httpStatusCodes.StatusBadRequest
+      )
+    );
+
+  // filter out unwanted field names
+  const filteredPayload = filterObj(req.body, 'name', 'email');
+
+  // Update user document
+  const updatedUser = await User.findByIdAndUpdate(
+    req.user.id,
+    filteredPayload,
+    {
+      new: true,
+      runValidators: true,
+    }
+  );
+
+  res.status(httpStatusCodes.StatusOK).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});
+
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user.id, { active: false });
+
+  res.status(httpStatusCodes.StatusNoContent).json({
+    status: 'success',
+    message: 'Your account has been deleted',
+  });
+});
+
 exports.getUser = (req, res) => {
   res.status(500).json({
     status: 'error',
