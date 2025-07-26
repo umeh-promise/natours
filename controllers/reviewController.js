@@ -3,7 +3,7 @@ const handlers = require('./handlers');
 
 exports.getAllReviews = handlers.getAll(Review);
 
-exports.setTourUserId = (req, res, next) => {
+exports.setTourUserIds = (req, res, next) => {
   if (!req.body.tour) req.body.tour = req.params.tourId;
   if (!req.user.tour) req.body.user = req.user.id;
   next();

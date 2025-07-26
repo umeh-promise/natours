@@ -14,6 +14,11 @@ const filterObj = (obj, ...allowedFields) => {
 };
 
 exports.getAllUsers = handlers.getAll(User);
+exports.getMe = (req, res, next) => {
+  req.params.id = req.user.id;
+
+  next();
+};
 
 exports.updateMe = catchAsync(async (req, res, next) => {
   // Return error when user wants to update the password
