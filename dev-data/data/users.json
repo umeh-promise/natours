@@ -1,7 +1,7 @@
 [
   {
     "_id": "5c8a1d5b0190b214360dc057",
-    "name": "Jonas Schmedtmann",
+    "name": "Promise Umeh",
     "email": "admin@natours.io",
     "role": "admin",
     "active": true,
@@ -10,9 +10,9 @@
   },
   {
     "_id": "5c8a1dfa2f8fb814b56fa181",
-    "name": "Lourdes Browning",
+    "name": "Jonas Schmedtmann",
     "email": "loulou@example.com",
-    "role": "user",
+    "role": "lead-guide",
     "active": true,
     "photo": "user-2.jpg",
     "password": "$2a$12$hP1h2pnNp7wgyZNRwPsOTeZuNzWBv7vHmsR3DT/OaPSUBQT.y0S.."
