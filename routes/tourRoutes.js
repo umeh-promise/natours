@@ -10,9 +10,7 @@ router.use('/:tourId/reviews', reviewRouter);
 router
   .route('/top-tours')
   .get(tourController.aliasTopTours, tourController.getAllTours);
-
 router.route('/tour-stats').get(tourController.getTourStats);
-
 router
   .route('/monthly-plan/:year')
   .get(
@@ -20,6 +18,13 @@ router
     authController.restrictTo('admin', 'lead-guide', 'guide'),
     tourController.getMontlyPlan
   );
+
+router.get(
+  '/tours-within/:distance/center/:latlng/unit/:unit',
+  tourController.getToursWithin
+);
+router.get('/distance/:latlng/unit/:unit', tourController.getDistances);
+
 router
   .route('/')
   .get(tourController.getAllTours)
